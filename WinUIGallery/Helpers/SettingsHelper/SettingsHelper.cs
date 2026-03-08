@@ -57,6 +57,16 @@ public partial class SettingsHelper : ObservableSettings
         set => Set(value);
     }
 
+    public int BlogSidebarWidth
+    {
+        get => GetOrCreateDefault<int>(320);
+        set
+        {
+            int normalized = Math.Clamp(value, 220, 460);
+            Set(normalized);
+        }
+    }
+
     public bool BlogWrapDocumentText
     {
         get => GetOrCreateDefault<bool>(true);

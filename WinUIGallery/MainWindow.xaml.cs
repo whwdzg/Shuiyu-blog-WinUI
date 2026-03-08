@@ -21,8 +21,6 @@ public sealed partial class MainWindow : Window
 {
     private readonly Grid _rootLayout;
     private readonly TitleBar _titleBar;
-    private readonly Button _titleBarBackButton;
-    private readonly Button _titleBarPaneButton;
     private readonly NavigationView _rootNavigationView;
     private readonly Frame _rootFrame;
 
@@ -44,45 +42,16 @@ public sealed partial class MainWindow : Window
         {
             Title = "水鱼 Blog (Shuiyu Blog)",
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            IsBackButtonVisible = false,
-            IsPaneToggleButtonVisible = false,
+            IsBackButtonVisible = true,
+            IsBackButtonEnabled = false,
+            IsPaneToggleButtonVisible = true,
         };
         _titleBar.IconSource = new ImageIconSource
         {
             ImageSource = new BitmapImage(new Uri("ms-appx:///Assets/Tiles/ShuiyuBlogIcon.ico")),
         };
-
-        _titleBarBackButton = new Button
-        {
-            Width = 32,
-            Height = 32,
-            Padding = new Thickness(0),
-            Content = new SymbolIcon(Symbol.Back),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-        _titleBarBackButton.Click += TitleBarBackButton_Click;
-
-        _titleBarPaneButton = new Button
-        {
-            Width = 32,
-            Height = 32,
-            Padding = new Thickness(0),
-            Content = new SymbolIcon(Symbol.GlobalNavigationButton),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-        _titleBarPaneButton.Click += TitleBarPaneButton_Click;
-
-        StackPanel leftHeaderButtons = new()
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 6,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-        leftHeaderButtons.Children.Add(_titleBarBackButton);
-        leftHeaderButtons.Children.Add(_titleBarPaneButton);
-        _titleBar.LeftHeader = leftHeaderButtons;
+        _titleBar.BackRequested += TitleBar_BackRequested;
+        _titleBar.PaneToggleRequested += TitleBar_PaneToggleRequested;
 
         _rootNavigationView = new NavigationView
         {
@@ -162,12 +131,12 @@ public sealed partial class MainWindow : Window
         UpdateTitleBarBackButtonState();
     }
 
-    private void TitleBarPaneButton_Click(object sender, RoutedEventArgs e)
+    private void TitleBar_PaneToggleRequested(TitleBar sender, object args)
     {
         _rootNavigationView.IsPaneOpen = !_rootNavigationView.IsPaneOpen;
     }
 
-    private void TitleBarBackButton_Click(object sender, RoutedEventArgs e)
+    private void TitleBar_BackRequested(TitleBar sender, object args)
     {
         if (_rootFrame.CanGoBack)
         {
@@ -179,9 +148,7 @@ public sealed partial class MainWindow : Window
 
     private void UpdateTitleBarBackButtonState()
     {
-        bool canGoBack = _rootFrame.CanGoBack;
-        _titleBarBackButton.IsEnabled = canGoBack;
-        _titleBarBackButton.Opacity = canGoBack ? 1.0 : 0.5;
+        _titleBar.IsBackButtonEnabled = _rootFrame.CanGoBack;
     }
 
     private void BuildMenuItems()
@@ -306,7 +273,31 @@ public sealed partial class MainWindow : Window
         if (tag.StartsWith("doc:", StringComparison.Ordinal))
         {
             string relativePath = tag[4..];
-            _rootFrame.Navigate(typeof(ShuiyuReplicaPage), relativePath);
+            string normalized = relativePath.Replace('\\', '/').TrimStart('/').ToLowerInvariant();
+            Type targetPage = normalized switch
+            {
+                "about.html" => typeof(AboutPage),
+                "column/comments.html" => typeof(CommentsPage),
+                "media/bilibili.html" => typeof(BilibiliPage),
+                "video-archive/list-bilivideo.html" => typeof(VideoArchivePage),
+                "projects/modrinth.html" => typeof(ProjectModrinthPage),
+                "projects/better-crafting-recipes.html" => typeof(ProjectBetterCraftingRecipesPage),
+                "projects/better-enchantments.html" => typeof(ProjectBetterEnchantmentsPage),
+                "projects/better-mob-drop.html" => typeof(ProjectBetterMobDropPage),
+                "projects/magical-dye.html" => typeof(ProjectMagicalDyePage),
+                "projects/github.html" => typeof(ProjectGithubPage),
+                _ => typeof(ShuiyuReplicaPage),
+            };
+
+            if (targetPage == typeof(ShuiyuReplicaPage))
+            {
+                _rootFrame.Navigate(targetPage, relativePath);
+            }
+            else
+            {
+                _rootFrame.Navigate(targetPage);
+            }
+
             return;
         }
 
@@ -346,7 +337,7 @@ public sealed partial class MainWindow : Window
     public void RefreshBlogLayoutSettings()
     {
         bool compact = SettingsHelper.Current.BlogCompactSidebar;
-        _rootNavigationView.OpenPaneLength = compact ? 230 : 320;
+        _rootNavigationView.OpenPaneLength = SettingsHelper.Current.BlogSidebarWidth;
         _rootNavigationView.CompactPaneLength = compact ? 44 : 48;
     }
 

@@ -3,6 +3,7 @@
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using WinUIGallery.Helpers;
 
 namespace WinUIGallery.ShuiyuBlog.Pages;
@@ -10,6 +11,8 @@ namespace WinUIGallery.ShuiyuBlog.Pages;
 public sealed partial class ShuiyuBlogSettingsPage : Page
 {
     private readonly ToggleSwitch _compactSidebarToggle;
+    private readonly Slider _sidebarWidthSlider;
+    private readonly TextBlock _sidebarWidthValueTextBlock;
     private readonly ToggleSwitch _wrapTextToggle;
     private readonly ToggleSwitch _confirmExternalToggle;
     private readonly ToggleSwitch _startupTipToggle;
@@ -25,6 +28,24 @@ public sealed partial class ShuiyuBlogSettingsPage : Page
             IsOn = SettingsHelper.Current.BlogCompactSidebar,
         };
         _compactSidebarToggle.Toggled += CompactSidebarToggle_Toggled;
+
+        _sidebarWidthSlider = new Slider
+        {
+            Header = "侧边栏宽度",
+            Minimum = 220,
+            Maximum = 460,
+            StepFrequency = 2,
+            SmallChange = 2,
+            LargeChange = 20,
+            Value = SettingsHelper.Current.BlogSidebarWidth,
+        };
+        _sidebarWidthSlider.ValueChanged += (_, _) => SidebarWidthSlider_ValueChanged();
+
+        _sidebarWidthValueTextBlock = new TextBlock
+        {
+            Opacity = 0.78,
+            Text = $"当前宽度: {SettingsHelper.Current.BlogSidebarWidth}px",
+        };
 
         _wrapTextToggle = new ToggleSwitch
         {
@@ -99,7 +120,7 @@ public sealed partial class ShuiyuBlogSettingsPage : Page
         };
 
         StackPanel cards = new() { Spacing = 10 };
-        cards.Children.Add(CreateSettingCard("布局", "控制导航和初始分区。", _compactSidebarToggle, _defaultSectionComboBox));
+        cards.Children.Add(CreateSettingCard("布局", "控制导航和初始分区。", _compactSidebarToggle, _sidebarWidthSlider, _sidebarWidthValueTextBlock, _defaultSectionComboBox));
         cards.Children.Add(CreateSettingCard("阅读", "控制原生文档页面呈现。", _wrapTextToggle));
         cards.Children.Add(CreateSettingCard("交互", "控制外链安全和启动提示。", _confirmExternalToggle, _startupTipToggle));
 
@@ -152,6 +173,14 @@ public sealed partial class ShuiyuBlogSettingsPage : Page
     private void CompactSidebarToggle_Toggled(object sender, RoutedEventArgs e)
     {
         SettingsHelper.Current.BlogCompactSidebar = _compactSidebarToggle.IsOn;
+        App.MainWindow.RefreshBlogLayoutSettings();
+    }
+
+    private void SidebarWidthSlider_ValueChanged()
+    {
+        int width = (int)Math.Round(_sidebarWidthSlider.Value);
+        SettingsHelper.Current.BlogSidebarWidth = width;
+        _sidebarWidthValueTextBlock.Text = $"当前宽度: {SettingsHelper.Current.BlogSidebarWidth}px";
         App.MainWindow.RefreshBlogLayoutSettings();
     }
 

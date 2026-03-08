@@ -57,7 +57,7 @@ public sealed partial class ShuiyuReplicaPage : Page
             _relativePath = relativePath;
         }
 
-        BuildFromPage(_relativePath.Replace('\\\\', '/').TrimStart('/'));
+        BuildFromPage(_relativePath.Replace('\\', '/').TrimStart('/'));
     }
 
     private void BuildFromPage(string relativePath)
