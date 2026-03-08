@@ -44,7 +44,7 @@ public sealed partial class HomePage : ItemsPageBase
         if (items == null || items.Count == 0)
             return new List<ControlInfoDataItem>();
 
-        Dictionary<string, ControlInfoDataItem> itemMap = Items.ToDictionary(i => i.UniqueId);
+        Dictionary<string, ControlInfoDataItem> itemMap = (Items ?? new List<ControlInfoDataItem>()).ToDictionary(i => i.UniqueId);
 
         List<ControlInfoDataItem> result = new();
 

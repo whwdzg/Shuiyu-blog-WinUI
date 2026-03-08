@@ -18,11 +18,14 @@ public partial class JsonSettingsProvider : ISettingsProvider
 
     public bool Contains(string key) => values.ContainsKey(key);
 
-    public object Get(string key) => values.TryGetValue(key, out var value) ? value : null;
+    public object Get(string key) => values.TryGetValue(key, out JsonElement value) ? value : null!;
 
     public void Set(string key, object value)
     {
-        var json = JsonSerializer.SerializeToElement(value, SettingsJsonContext.Default.GetTypeInfo(value.GetType()));
+        var typeInfo = SettingsJsonContext.Default.GetTypeInfo(value.GetType());
+        var json = typeInfo is null
+            ? JsonSerializer.SerializeToElement(value)
+            : JsonSerializer.SerializeToElement(value, typeInfo);
         values[key] = json;
         Save();
     }
@@ -30,23 +33,31 @@ public partial class JsonSettingsProvider : ISettingsProvider
     public T Get<T>(string key)
     {
         if (!values.TryGetValue(key, out var jsonElement))
-            return default;
+            return default!;
 
         try
         {
-            return (T)jsonElement.Deserialize(SettingsJsonContext.Default.GetTypeInfo(typeof(T)));
+            var typeInfo = SettingsJsonContext.Default.GetTypeInfo(typeof(T));
+            if (typeInfo is null)
+                return default!;
+
+            object? deserialized = jsonElement.Deserialize(typeInfo);
+            return deserialized is T typed ? typed : default!;
         }
         catch (Exception)
         {
             HandleCorruptedKey(key);
-            return default;
+            return default!;
         }
     }
 
 
     public void Set<T>(string key, T value)
     {
-        var json = JsonSerializer.SerializeToElement(value, SettingsJsonContext.Default.GetTypeInfo(typeof(T)));
+        var typeInfo = SettingsJsonContext.Default.GetTypeInfo(typeof(T));
+        var json = typeInfo is null
+            ? JsonSerializer.SerializeToElement(value)
+            : JsonSerializer.SerializeToElement(value, typeInfo);
         values[key] = json;
         Save();
     }

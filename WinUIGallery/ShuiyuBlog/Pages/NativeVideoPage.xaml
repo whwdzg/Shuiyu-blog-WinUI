@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="WinUIGallery.ShuiyuBlog.Pages.NativeVideoPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="20" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Spacing="4">
+            <TextBlock FontSize="28" FontWeight="SemiBold" Text="原生视频播放器" />
+            <TextBlock x:Name="NowPlayingTextBlock" Opacity="0.8" Text="当前未播放" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="UrlTextBox" PlaceholderText="输入视频 URL，例如 https://.../video.mp4" />
+            <Button Grid.Column="1" Content="播放 URL" Click="PlayUrlButton_Click" />
+            <Button Grid.Column="2" Content="添加本地视频" Click="PickVideoButton_Click" />
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+            <MediaPlayerElement x:Name="VideoPlayer" AreTransportControlsEnabled="True" AutoPlay="False" />
+
+            <Border Grid.Column="1" Padding="10" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+                <StackPanel Spacing="8">
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="播放列表" />
+                    <ListView x:Name="PlaylistListView" IsItemClickEnabled="True" ItemClick="PlaylistListView_ItemClick" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

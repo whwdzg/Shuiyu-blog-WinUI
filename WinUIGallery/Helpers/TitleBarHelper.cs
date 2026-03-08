@@ -15,7 +15,7 @@ internal partial class TitleBarHelper
     {
         if (window.AppWindow != null)
         {
-            var foregroundColor = currentTheme == ElementTheme.Dark ? Colors.White : Colors.Black;
+            var foregroundColor = currentTheme == ElementTheme.Dark ? Microsoft.UI.Colors.White : Microsoft.UI.Colors.Black;
             window.AppWindow.TitleBar.ButtonForegroundColor = foregroundColor;
             window.AppWindow.TitleBar.ButtonHoverForegroundColor = foregroundColor;
 

@@ -42,7 +42,7 @@
     <WindowsAppSdkSelfContained Condition="'$(WindowsAppSdkSelfContained)' == '' and '$(PublishSingleFile)' == 'true'">true</WindowsAppSdkSelfContained>
     <!-- Enable ExplicitlyIncludeVersionInfo workaround by setting WindowsAppSdkSelfContained earlier than the mock package would -->
     <WindowsAppSdkSelfContained Condition="'$(IsInWinUIRepo)' == 'true' and '$(WindowsAppSdkSelfContained)'==''">true</WindowsAppSdkSelfContained>
-    <ApplicationIcon>Assets\Tiles\GalleryIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\Tiles\ShuiyuBlogIcon.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
   </PropertyGroup>
@@ -55,6 +55,7 @@
 
   <PropertyGroup Condition="'$(Packaged)' == 'true' and '$(SingleProject)'=='true'">
     <WindowsPackageType>MSIX</WindowsPackageType>
+    <AppxLayoutDir>$(MSBuildProjectDirectory)\AppXLayout\</AppxLayoutDir>
     <AppxBundleNameForOutput>WinUIGallery</AppxBundleNameForOutput>
     <EnableMsixTooling>true</EnableMsixTooling>
     <SDKIdentifier>Windows</SDKIdentifier>
@@ -166,6 +167,13 @@
     <Compile Remove="Helpers\ColorCode.internal\RichTextBlockFormatter.cs" Condition="'$(IsInWinUIRepo)' != 'true'" />
     <Compile Remove="Helpers\ColorCode.internal\ExtensionMethods.cs" Condition="'$(IsInWinUIRepo)' != 'true'" />
     <Content Remove="@(Content)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\whwdzg.github.io\**\*">
+      <Link>SiteContent\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -602,6 +610,33 @@
 
   <ItemGroup>
     <Page Update="Controls\HorizontalScrollContainer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="ShuiyuBlog\Pages\ShuiyuBlogPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ShuiyuBlog\Pages\Base64ToolPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ShuiyuBlog\Pages\BaseConvertToolPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ShuiyuBlog\Pages\ScientificCalculatorPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ShuiyuBlog\Pages\CardTemplatePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ShuiyuBlog\Pages\NativeDocumentPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ShuiyuBlog\Pages\NativeMusicPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="ShuiyuBlog\Pages\NativeVideoPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

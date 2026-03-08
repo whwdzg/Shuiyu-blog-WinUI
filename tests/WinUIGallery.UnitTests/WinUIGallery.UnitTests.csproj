@@ -18,7 +18,7 @@
         <UseWinUI>true</UseWinUI>
         <EnableMsixTooling>true</EnableMsixTooling>
         <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
-        <SelfContained>true</SelfContained>
+        <SelfContained>false</SelfContained>
     </PropertyGroup>
 
     <ItemGroup>

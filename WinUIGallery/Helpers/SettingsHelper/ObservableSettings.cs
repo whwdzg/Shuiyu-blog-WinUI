@@ -12,32 +12,36 @@ public partial class ObservableSettings : INotifyPropertyChanged
         this.provider = provider;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected bool Set<T>(T value, [CallerMemberName] string propertyName = null)
+    protected bool Set<T>(T value, [CallerMemberName] string? propertyName = null)
     {
-        if (provider.Contains(propertyName))
+        string key = propertyName ?? string.Empty;
+
+        if (provider.Contains(key))
         {
-            var currentValue = provider.Get<T>(propertyName);
+            T? currentValue = provider.Get<T>(key);
             if (Equals(currentValue, value))
                 return false;
         }
 
-        provider.Set(propertyName, value);
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        provider.Set(key, value!);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(key));
         return true;
     }
 
-    protected T Get<T>([CallerMemberName] string propertyName = null)
+    protected T? Get<T>([CallerMemberName] string? propertyName = null)
     {
-        return provider.Get<T>(propertyName);
+        return provider.Get<T>(propertyName ?? string.Empty);
     }
 
-    protected T GetOrCreateDefault<T>(T defaultValue, [CallerMemberName] string propertyName = null)
+    protected T GetOrCreateDefault<T>(T defaultValue, [CallerMemberName] string? propertyName = null)
     {
-        if (!provider.Contains(propertyName))
-            Set(defaultValue, propertyName);
+        string key = propertyName ?? string.Empty;
+        if (!provider.Contains(key))
+            Set(defaultValue, key);
 
-        return Get<T>(propertyName);
+        T? value = Get<T>(key);
+        return value is null ? defaultValue : value;
     }
 }

@@ -23,7 +23,7 @@ public sealed partial class ColorSelector : UserControl
             nameof(Color),
             typeof(Color),
             typeof(ColorSelector),
-            new PropertyMetadata(Colors.Transparent, OnColorPropertyChanged));
+            new PropertyMetadata(Microsoft.UI.Colors.Transparent, OnColorPropertyChanged));
 
     public Color Color
     {

@@ -17,9 +17,7 @@ public sealed partial class AppWindowTitleBarPage : Page
     private AppWindowTitleBarExtendWindow? extendWindow;
     private AppWindowTitleBarThemeWindow? themeHeightWindow;
     private IReadOnlyList<TitleBarTheme> titleBarThemes { get; set; } = new List<TitleBarTheme>(Enum.GetValues<TitleBarTheme>());
-    private TitleBarTheme selectedTheme = TitleBarTheme.UseDefaultAppMode;
     private IReadOnlyList<TitleBarHeightOption> titleBarHeightOptions { get; set; } = new List<TitleBarHeightOption>(Enum.GetValues<TitleBarHeightOption>());
-    private TitleBarHeightOption selectedHeight = TitleBarHeightOption.Standard;
 
     public AppWindowTitleBarPage()
     {
@@ -156,14 +154,18 @@ public sealed partial class AppWindowTitleBarPage : Page
 
     private string ColorToArgbString(Color color) => $"{color.A}, {color.R}, {color.G}, {color.B}";
 
-    private string BoolToLowerString(bool? value) => value.ToString().ToLower();
+    private string BoolToLowerString(bool? value) => value is true ? "true" : "false";
 
     private void ShowExtendButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
+        TitleBarHeightOption selectedHeight = HeightComboBox.SelectedItem is TitleBarHeightOption heightOption
+            ? heightOption
+            : TitleBarHeightOption.Standard;
+
         ShowExtendButton.IsEnabled = false;
         extendWindow = new AppWindowTitleBarExtendWindow(
             ExtendContentCheckBox.IsChecked ?? false,
-            (TitleBarHeightOption)HeightComboBox.SelectedItem);
+            selectedHeight);
         extendWindow.Activate();
         extendWindow.Closed += ExtendWindow_Closed;
     }
@@ -194,16 +196,22 @@ public sealed partial class AppWindowTitleBarPage : Page
 
     private void HeightComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (extendWindow != null && extendWindow.AppWindow.TitleBar.ExtendsContentIntoTitleBar)
+        if (extendWindow != null
+            && extendWindow.AppWindow.TitleBar.ExtendsContentIntoTitleBar
+            && HeightComboBox.SelectedItem is TitleBarHeightOption heightOption)
         {
-            extendWindow.AppWindow.TitleBar.PreferredHeightOption = ((TitleBarHeightOption)HeightComboBox.SelectedItem);
+            extendWindow.AppWindow.TitleBar.PreferredHeightOption = heightOption;
         }
     }
 
     private void ShowThemeButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
+        TitleBarTheme selectedTheme = ThemeComboBox.SelectedItem is TitleBarTheme titleBarTheme
+            ? titleBarTheme
+            : TitleBarTheme.UseDefaultAppMode;
+
         ShowThemeHeightButton.IsEnabled = false;
-        themeHeightWindow = new AppWindowTitleBarThemeWindow((TitleBarTheme)ThemeComboBox.SelectedItem);
+        themeHeightWindow = new AppWindowTitleBarThemeWindow(selectedTheme);
         themeHeightWindow.Activate();
         themeHeightWindow.Closed += ThemeHeightWindow_Closed;
     }
@@ -218,9 +226,9 @@ public sealed partial class AppWindowTitleBarPage : Page
 
     private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (themeHeightWindow != null)
+        if (themeHeightWindow != null && ThemeComboBox.SelectedItem is TitleBarTheme titleBarTheme)
         {
-            themeHeightWindow.AppWindow.TitleBar.PreferredTheme = ((TitleBarTheme)ThemeComboBox.SelectedItem);
+            themeHeightWindow.AppWindow.TitleBar.PreferredTheme = titleBarTheme;
         }
     }
 }

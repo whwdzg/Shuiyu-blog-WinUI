@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="WinUIGallery.ShuiyuBlog.Pages.ScientificCalculatorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="20" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock FontSize="26" FontWeight="SemiBold" Text="科学计算器" />
+
+        <TextBox x:Name="ExpressionTextBox" Grid.Row="1" Header="表达式" PlaceholderText="示例: sin(0.5) + 2*3" />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+            <Button Content="计算" Click="EvaluateButton_Click" />
+            <Button Content="清空" Click="ClearButton_Click" />
+        </StackPanel>
+
+        <TextBlock x:Name="ResultTextBlock" Grid.Row="3" FontSize="20" Text="结果：" TextWrapping="Wrap" />
+    </Grid>
+</Page>
