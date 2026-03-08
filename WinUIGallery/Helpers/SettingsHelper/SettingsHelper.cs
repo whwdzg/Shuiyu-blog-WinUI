@@ -51,6 +51,36 @@ public partial class SettingsHelper : ObservableSettings
         set => Set(value);
     }
 
+    public bool BlogCompactSidebar
+    {
+        get => GetOrCreateDefault<bool>(false);
+        set => Set(value);
+    }
+
+    public bool BlogWrapDocumentText
+    {
+        get => GetOrCreateDefault<bool>(true);
+        set => Set(value);
+    }
+
+    public bool BlogConfirmExternalNavigation
+    {
+        get => GetOrCreateDefault<bool>(true);
+        set => Set(value);
+    }
+
+    public string BlogDefaultSection
+    {
+        get => GetOrCreateDefault<string>("全部");
+        set => Set(string.IsNullOrWhiteSpace(value) ? "全部" : value);
+    }
+
+    public bool BlogShowStartupTips
+    {
+        get => GetOrCreateDefault<bool>(true);
+        set => Set(value);
+    }
+
     public void UpdateFavorites(Action<List<string>> updater)
     {
         var list = Favorites;

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using WinUIGallery.Helpers;
 using WinUIGallery.ShuiyuBlog.Models;
 using WinUIGallery.ShuiyuBlog.Services;
 
@@ -130,9 +131,15 @@ public sealed partial class ShuiyuBlogPage : Page
     {
         base.OnNavigatedTo(e);
 
+        _detailTextBox.TextWrapping = SettingsHelper.Current.BlogWrapDocumentText ? TextWrapping.Wrap : TextWrapping.NoWrap;
+
         if (e.Parameter is string initialSection && !string.IsNullOrWhiteSpace(initialSection))
         {
             _initialSection = initialSection;
+        }
+        else
+        {
+            _initialSection = SettingsHelper.Current.BlogDefaultSection;
         }
     }
 

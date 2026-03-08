@@ -40,6 +40,11 @@ public sealed class SiteContentService
         foreach (string file in files)
         {
             string relativePath = Path.GetRelativePath(siteRoot, file).Replace('\\', '/');
+            if (relativePath.StartsWith("Legacy-1.0/", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
             string text = await File.ReadAllTextAsync(file);
 
             string title = GetTitle(relativePath, text);

@@ -35,16 +35,19 @@
                     <SolidColorBrush x:Key="HomePageBackgroundBrush" Color="Transparent" />
                     <StaticResource x:Key="GalleryBackgroundBrush" ResourceKey="SolidBackgroundFillColorBaseBrush" />
                     <StaticResource x:Key="GalleryBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+                    <StaticResource x:Key="Win11ControlBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="HomePageBackgroundBrush" Color="Transparent" />
                     <StaticResource x:Key="GalleryBackgroundBrush" ResourceKey="SolidBackgroundFillColorBaseBrush" />
                     <StaticResource x:Key="GalleryBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+                    <StaticResource x:Key="Win11ControlBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">
                     <SolidColorBrush x:Key="HomePageBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
                     <SolidColorBrush x:Key="GalleryBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
                     <SolidColorBrush x:Key="GalleryBorderBrush" Color="{ThemeResource SystemColorWindowColor}" />
+                    <SolidColorBrush x:Key="Win11ControlBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
@@ -59,6 +62,75 @@
             <!--  Style Overrides  -->
             <SolidColorBrush x:Key="GridViewHeaderItemDividerStroke" Color="Transparent" />
             <x:Double x:Key="TeachingTipMinWidth">48</x:Double>
+            <Thickness x:Key="Win11ControlBorderThickness">1</Thickness>
+            <CornerRadius x:Key="Win11ControlCornerRadius">8</CornerRadius>
+
+            <!--  Win11 framed chrome for common controls  -->
+            <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="PasswordBox" BasedOn="{StaticResource DefaultPasswordBoxStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="RichEditBox" BasedOn="{StaticResource DefaultRichEditBoxStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="AutoSuggestBox" BasedOn="{StaticResource DefaultAutoSuggestBoxStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="ComboBox" BasedOn="{StaticResource DefaultComboBoxStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="NumberBox" BasedOn="{StaticResource DefaultNumberBoxStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="DatePicker" BasedOn="{StaticResource DefaultDatePickerStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="CalendarDatePicker" BasedOn="{StaticResource DefaultCalendarDatePickerStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
+
+            <Style TargetType="TimePicker" BasedOn="{StaticResource DefaultTimePickerStyle}">
+                <Setter Property="BorderBrush" Value="{ThemeResource Win11ControlBorderBrush}" />
+                <Setter Property="BorderThickness" Value="{StaticResource Win11ControlBorderThickness}" />
+                <Setter Property="CornerRadius" Value="{StaticResource Win11ControlCornerRadius}" />
+            </Style>
 
             <!--  Converters  -->
             <converters:NullableBooleanToBooleanConverter x:Key="nullableBooleanToBooleanConverter" />

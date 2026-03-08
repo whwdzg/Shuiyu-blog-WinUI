@@ -13,6 +13,10 @@ namespace WinUIGallery.ShuiyuBlog.Services;
 
 public sealed class NativeDocumentService
 {
+    private const int MaxPlainTextLength = 120000;
+    private const int MaxImageCount = 120;
+    private const int MaxLinkCount = 200;
+
     private static readonly Regex TitleRegex = new("<title>(.*?)</title>", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
     private static readonly Regex StripScriptRegex = new("<script[\\s\\S]*?</script>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex StripStyleRegex = new("<style[\\s\\S]*?</style>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -32,28 +36,42 @@ public sealed class NativeDocumentService
             return null;
         }
 
-        string rawContent = await File.ReadAllTextAsync(fullPath);
-        string plainText = ToPlainText(entry.FileType, rawContent);
-        List<NativeDocumentImageItem> images = ExtractImages(rawContent, siteRoot, Path.GetDirectoryName(fullPath) ?? siteRoot);
-        List<NativeDocumentLinkItem> links = ExtractLinks(rawContent);
+        string rawContent = await File.ReadAllTextAsync(fullPath).ConfigureAwait(false);
 
-        string title = entry.Title;
-        Match titleMatch = TitleRegex.Match(rawContent);
-        if (titleMatch.Success)
+        return await Task.Run(() =>
         {
-            title = WhiteSpaceRegex.Replace(WebUtility.HtmlDecode(titleMatch.Groups[1].Value).Trim(), " ");
+            string plainText = TrimForDisplay(ToPlainText(entry.FileType, rawContent));
+            List<NativeDocumentImageItem> images = ExtractImages(rawContent, siteRoot, Path.GetDirectoryName(fullPath) ?? siteRoot);
+            List<NativeDocumentLinkItem> links = ExtractLinks(rawContent);
+
+            string title = entry.Title;
+            Match titleMatch = TitleRegex.Match(rawContent);
+            if (titleMatch.Success)
+            {
+                title = WhiteSpaceRegex.Replace(WebUtility.HtmlDecode(titleMatch.Groups[1].Value).Trim(), " ");
+            }
+
+            return new NativeDocumentDetail
+            {
+                Title = title,
+                RelativePath = entry.RelativePath,
+                Section = entry.Section,
+                FileType = entry.FileType,
+                PlainText = plainText,
+                Images = images,
+                Links = links,
+            };
+        }).ConfigureAwait(false);
+    }
+
+    private static string TrimForDisplay(string plainText)
+    {
+        if (plainText.Length <= MaxPlainTextLength)
+        {
+            return plainText;
         }
 
-        return new NativeDocumentDetail
-        {
-            Title = title,
-            RelativePath = entry.RelativePath,
-            Section = entry.Section,
-            FileType = entry.FileType,
-            PlainText = plainText,
-            Images = images,
-            Links = links,
-        };
+        return plainText[..MaxPlainTextLength] + "\n\n[内容较长，已截断显示以保证页面流畅。]";
     }
 
     private static string ToPlainText(string fileType, string raw)
@@ -95,6 +113,11 @@ public sealed class NativeDocumentService
                 DisplayName = displayName,
                 SourcePath = resolved,
             });
+
+            if (items.Count >= MaxImageCount)
+            {
+                break;
+            }
         }
 
         return items;
@@ -125,6 +148,11 @@ public sealed class NativeDocumentService
                 DisplayName = display,
                 Url = uri.AbsoluteUri,
             });
+
+            if (items.Count >= MaxLinkCount)
+            {
+                break;
+            }
         }
 
         return items;

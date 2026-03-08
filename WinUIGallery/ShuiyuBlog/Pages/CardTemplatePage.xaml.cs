@@ -4,7 +4,9 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using System;
 using System.Collections.ObjectModel;
+using WinUIGallery.Helpers;
 using WinUIGallery.ShuiyuBlog.Models;
 using WinUIGallery.ShuiyuBlog.Services;
 using Windows.System;
@@ -52,11 +54,37 @@ public sealed partial class CardTemplatePage : Page
         }
     }
 
-    private void OpenExternalButton_Click(object sender, RoutedEventArgs e)
+    private async void OpenExternalButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is string url)
+        if (sender is not Button button || button.Tag is not string url)
         {
-            _ = Launcher.LaunchUriAsync(new System.Uri(url));
+            return;
         }
+
+        if (!System.Uri.TryCreate(url, System.UriKind.Absolute, out System.Uri? uri))
+        {
+            return;
+        }
+
+        if (SettingsHelper.Current.BlogConfirmExternalNavigation)
+        {
+            ContentDialog dialog = new()
+            {
+                XamlRoot = XamlRoot,
+                Title = "打开外部链接",
+                Content = uri.AbsoluteUri,
+                PrimaryButtonText = "继续",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Close,
+            };
+
+            ContentDialogResult result = await dialog.ShowAsync();
+            if (result != ContentDialogResult.Primary)
+            {
+                return;
+            }
+        }
+
+        _ = Launcher.LaunchUriAsync(uri);
     }
 }

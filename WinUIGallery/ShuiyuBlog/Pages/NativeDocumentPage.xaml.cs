@@ -6,7 +6,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Threading.Tasks;
 using Windows.System;
+using WinUIGallery.Helpers;
 using WinUIGallery.ShuiyuBlog.Models;
 using WinUIGallery.ShuiyuBlog.Services;
 
@@ -76,8 +78,9 @@ public sealed partial class NativeDocumentPage : Page
 
         StackPanel contentStack = new() { Spacing = 16 };
         contentStack.Children.Add(new Expander { Header = "正文（原生解析）", IsExpanded = true, Content = _contentTextBox });
-        contentStack.Children.Add(new Expander { Header = "图片", IsExpanded = true, Content = _imageRepeater });
-        contentStack.Children.Add(new Expander { Header = "外部链接", IsExpanded = true, Content = _linkRepeater });
+        // Keep heavy sections collapsed by default to reduce first-render pressure.
+        contentStack.Children.Add(new Expander { Header = "图片", IsExpanded = false, Content = _imageRepeater });
+        contentStack.Children.Add(new Expander { Header = "外部链接", IsExpanded = false, Content = _linkRepeater });
 
         root.Children.Add(header);
         ScrollViewer contentScrollViewer = new() { Content = contentStack };
@@ -99,7 +102,7 @@ public sealed partial class NativeDocumentPage : Page
     {
         return (DataTemplate)XamlReader.Load(
             "<DataTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml' xmlns:model='using:WinUIGallery.ShuiyuBlog.Models' x:DataType='model:NativeDocumentLinkItem'>" +
-            "<Border Padding='10' CornerRadius='8'><StackPanel Spacing='6'><TextBlock FontWeight='SemiBold' Text='{x:Bind DisplayName}' TextWrapping='WrapWholeWords' /><TextBlock Opacity='0.7' Text='{x:Bind Url}' TextWrapping='WrapWholeWords' /><HyperlinkButton Content='打开链接' NavigateUri='{x:Bind Url}' HorizontalAlignment='Left' /></StackPanel></Border>" +
+            "<Border Padding='10' CornerRadius='8'><StackPanel Spacing='6'><TextBlock FontWeight='SemiBold' Text='{x:Bind DisplayName}' TextWrapping='WrapWholeWords' /><TextBlock Opacity='0.7' Text='{x:Bind Url}' TextWrapping='WrapWholeWords' /><Button Content='打开链接' Tag='{x:Bind Url}' Click='OpenLinkButton_Click' HorizontalAlignment='Left' /></StackPanel></Border>" +
             "</DataTemplate>");
     }
 
@@ -112,8 +115,19 @@ public sealed partial class NativeDocumentPage : Page
             _titleTextBlock.Text = "原生页面";
             _metaTextBlock.Text = "未收到有效内容。";
             _contentTextBox.Text = string.Empty;
+            _imageRepeater.ItemsSource = null;
+            _linkRepeater.ItemsSource = null;
             return;
         }
+
+        _titleTextBlock.Text = entry.Title;
+        _metaTextBlock.Text = $"{entry.RelativePath} | {entry.Section} | 正在加载...";
+        _contentTextBox.TextWrapping = SettingsHelper.Current.BlogWrapDocumentText ? TextWrapping.Wrap : TextWrapping.NoWrap;
+        _contentTextBox.Text = "正在加载内容，请稍候...";
+        _imageRepeater.ItemsSource = null;
+        _linkRepeater.ItemsSource = null;
+
+        await System.Threading.Tasks.Task.Yield();
 
         NativeDocumentDetail? detail = await _documentService.LoadAsync(entry);
         if (detail is null)
@@ -133,9 +147,37 @@ public sealed partial class NativeDocumentPage : Page
 
     public async void OpenLinkButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button { Tag: string urlText } && Uri.TryCreate(urlText, UriKind.Absolute, out Uri? uri))
+        string urlText = sender is Button { Tag: string directUrl } ? directUrl : string.Empty;
+
+        if (Uri.TryCreate(urlText, UriKind.Absolute, out Uri? uri))
         {
-            _ = await Launcher.LaunchUriAsync(uri);
+            _ = await ConfirmAndLaunchUriAsync(uri);
         }
+    }
+
+    private async Task<bool> ConfirmAndLaunchUriAsync(Uri uri)
+    {
+        if (!SettingsHelper.Current.BlogConfirmExternalNavigation)
+        {
+            return await Launcher.LaunchUriAsync(uri);
+        }
+
+        ContentDialog dialog = new()
+        {
+            XamlRoot = XamlRoot,
+            Title = "打开外部链接",
+            Content = uri.AbsoluteUri,
+            PrimaryButtonText = "继续",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Close,
+        };
+
+        ContentDialogResult result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Primary)
+        {
+            return await Launcher.LaunchUriAsync(uri);
+        }
+
+        return false;
     }
 }
